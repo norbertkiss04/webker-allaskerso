@@ -1,0 +1,32 @@
+<mat-card class="register-card">
+  <mat-card-header>
+    <mat-card-title>Regisztráció</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form>
+      <mat-form-field appearance="outline">
+        <mat-label>Teljes név</mat-label>
+        <input matInput placeholder="Kovács János" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput placeholder="email@example.com" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Jelszó</mat-label>
+        <input matInput type="password" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Jelszó megerősítése</mat-label>
+        <input matInput type="password" />
+      </mat-form-field>
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="primary">Regisztráció</button>
+    <button mat-button routerLink="/login">Bejelentkezés</button>
+  </mat-card-actions>
+</mat-card>

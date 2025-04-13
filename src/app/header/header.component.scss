@@ -1,0 +1,59 @@
+mat-toolbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2rem;
+
+  .mobile-menu,
+  .mobile-nav {
+    display: none;
+  }
+
+  .desktop-nav {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .auth-section {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .active {
+    background-color: #bbdefb;
+    border-radius: 4px;
+  }
+}
+
+@media (max-width: 768px) {
+  mat-toolbar {
+    padding: 0 1rem;
+
+    .desktop-nav {
+      display: none;
+    }
+
+    .mobile-menu {
+      display: block;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: absolute;
+      top: 64px;
+      left: 0;
+      right: 0;
+      background: #1976d2;
+      flex-direction: column;
+      padding: 1rem;
+      z-index: 1000;
+
+      &.visible {
+        display: flex;
+      }
+    }
+
+    .auth-section {
+      margin-left: auto;
+    }
+  }
+}

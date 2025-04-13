@@ -1,0 +1,170 @@
+@use "@angular/material" as mat;
+
+$primary-color: #3f51b5;
+$chip-bg: #f8c2c2;
+$card-hover: rgba(0, 0, 0, 0.04);
+
+.jobs-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: "Roboto", sans-serif;
+}
+
+.search-bar {
+  width: 100%;
+  margin-bottom: 2rem;
+
+  .mat-form-field-suffix {
+    display: flex;
+    align-items: center;
+  }
+
+  .mat-icon-button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba($primary-color, 0.7);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba($primary-color, 0.1);
+      color: $primary-color;
+
+      .mat-icon {
+        transform: scale(1.1);
+      }
+    }
+
+    &::ng-deep .mat-button-focus-overlay {
+      background-color: rgba($primary-color, 0.1);
+    }
+  }
+
+  .mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+  }
+
+  .mat-form-field-outline {
+    border-radius: 28px;
+    padding: 0 16px;
+
+    &-start,
+    &-gap,
+    &-end {
+      border-color: rgba($primary-color, 0.2);
+    }
+  }
+
+  .mat-form-field-flex:hover .mat-form-field-outline {
+    &-start,
+    &-gap,
+    &-end {
+      border-color: rgba($primary-color, 0.4);
+    }
+  }
+}
+
+// Rest of the styles remain the same as in original
+.jobs-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.job-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background-color: $card-hover;
+  }
+
+  mat-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  mat-card-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #555;
+    font-size: 0.95rem;
+  }
+
+  mat-card-content {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+  }
+
+  mat-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+  }
+}
+
+.salary {
+  color: $primary-color;
+  font-weight: bold;
+  font-size: 1.05em;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skill-chip {
+  display: inline-block;
+  padding: 6px 14px;
+  margin: 4px 4px 0 0;
+  background-color: $chip-bg;
+  border-radius: 20px;
+  font-size: 0.85em;
+  color: #333;
+}
+
+.icon {
+  font-size: 18px;
+  vertical-align: middle;
+  color: #757575;
+}
+
+.details-button {
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  color: #333;
+  background-color: #fafafa;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  mat-icon {
+    font-size: 18px;
+    color: #555;
+  }
+}
+
+// Add this global style if ripple color isn't working
+::ng-deep .mat-ripple-element {
+  background-color: rgba($primary-color, 0.1) !important;
+}

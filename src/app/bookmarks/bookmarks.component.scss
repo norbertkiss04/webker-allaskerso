@@ -1,0 +1,44 @@
+@use "@angular/material" as mat;
+
+.bookmarks-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: "Roboto", sans-serif;
+}
+
+.bookmarks-list {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.bookmark-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  mat-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  mat-card-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #555;
+    font-size: 0.95rem;
+  }
+
+  mat-card-content {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+  }
+}

@@ -1,4 +1,10 @@
-# ProgrammerJobPortal
+# Álláskereső portál
+
+Email:Jelszó
+
+admin@admin.com:admin
+
+user@test.com:test123
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
 

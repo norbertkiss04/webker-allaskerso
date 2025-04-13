@@ -1,0 +1,14 @@
+<div class="bookmarks-container">
+  <h1>Your Bookmarked Jobs</h1>
+  <div class="bookmarks-list">
+    <mat-card *ngFor="let bookmark of bookmarks" class="bookmark-card">
+      <mat-card-header>
+        <mat-card-title>{{ bookmark.title }}</mat-card-title>
+        <mat-card-subtitle>{{ bookmark.company }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ bookmark.description }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

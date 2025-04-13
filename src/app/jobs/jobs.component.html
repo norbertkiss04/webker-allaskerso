@@ -1,0 +1,86 @@
+<div class="jobs-container">
+  <div *ngIf="authService.isAdmin()" class="admin-panel">
+    <button mat-raised-button color="primary" (click)="openJobDialog()">
+      Új állás hozzáadása
+    </button>
+  </div>
+
+  <mat-form-field appearance="outline" class="search-bar">
+    <mat-label>Keresés állások között</mat-label>
+    <input
+      matInput
+      [(ngModel)]="searchTerm"
+      placeholder="Pozíció vagy cég neve"
+    />
+    <button mat-icon-button matSuffix aria-label="Keresés">
+      <mat-icon>search</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <div class="jobs-grid">
+    <mat-card *ngFor="let job of filteredJobs" class="job-card">
+      <mat-card-header>
+        <mat-card-title>{{ job.title }}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-icon class="icon">business</mat-icon> {{ job.company }}
+          &nbsp;&nbsp;
+          <mat-icon class="icon">location_on</mat-icon> {{ job.location }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-divider></mat-divider>
+
+      <mat-card-content>
+        <p class="salary">
+          <mat-icon class="icon">payments</mat-icon>
+          {{ job.salary | number }} Ft
+        </p>
+        <p>{{ job.description | truncate : 100 : true }}</p>
+        <div *ngIf="showDetails[job.id]" class="details-section">
+          <h4>Részletes leírás:</h4>
+          <p>{{ job.longDescription | truncate : 250 : true }}</p>
+          <div class="contact-info">
+            <h4>Kapcsolat:</h4>
+            <div><mat-icon>email</mat-icon> {{ job.contactInfo.email }}</div>
+            <div *ngIf="job.contactInfo.phone">
+              <mat-icon>phone</mat-icon> {{ job.contactInfo.phone }}
+            </div>
+          </div>
+        </div>
+
+        <div class="requirements">
+          <span *ngFor="let skill of job.requirements" class="skill-chip">{{
+            skill
+          }}</span>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button
+          *ngIf="authService.isAdmin()"
+          mat-icon-button
+          color="warn"
+          (click)="deleteJob(job.id)"
+          aria-label="Törlés"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button mat-icon-button (click)="toggleBookmark(job)">
+          <mat-icon>{{
+            isBookmarked(job.id) ? "bookmark" : "bookmark_border"
+          }}</mat-icon>
+        </button>
+        <button
+          mat-button
+          class="details-button"
+          (click)="toggleDetails(job.id)"
+        >
+          {{ showDetails[job.id] ? "Vissza" : "Részletek" }}
+          <mat-icon>{{
+            showDetails[job.id] ? "arrow_back" : "arrow_forward"
+          }}</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,49 @@
+<mat-toolbar color="primary">
+  <button
+    mat-icon-button
+    aria-label="Menu"
+    class="mobile-menu"
+    (click)="toggleMenu()"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <div class="mobile-nav" [class.visible]="isMenuOpen">
+    <a mat-button routerLink="/jobs" routerLinkActive="active">Állások</a>
+    <a
+      mat-button
+      *ngIf="authService.getCurrentUser()"
+      routerLink="/bookmarks"
+      routerLinkActive="active"
+      >Könyvjelzők</a
+    >
+  </div>
+
+  <nav class="desktop-nav">
+    <a mat-button routerLink="/jobs" routerLinkActive="active">Állások</a>
+    <a
+      mat-button
+      *ngIf="authService.getCurrentUser()"
+      routerLink="/bookmarks"
+      routerLinkActive="active"
+      >Könyvjelzők</a
+    >
+  </nav>
+
+  <div class="auth-section">
+    <a mat-button *ngIf="!authService.getCurrentUser()" routerLink="/login">{{
+      "Bejelentkezés"
+    }}</a>
+    <a mat-button *ngIf="!authService.getCurrentUser()" routerLink="/register"
+      >Regisztráció</a
+    >
+    <button
+      mat-raised-button
+      *ngIf="authService.getCurrentUser()"
+      color="accent"
+      (click)="onLogout()"
+    >
+      Kijelentkezés
+    </button>
+  </div>
+</mat-toolbar>
