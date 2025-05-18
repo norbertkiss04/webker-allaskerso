@@ -3,30 +3,71 @@
     <mat-card-title>Regisztráció</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <form>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <mat-form-field appearance="outline">
         <mat-label>Teljes név</mat-label>
-        <input matInput placeholder="Kovács János" />
+        <input matInput formControlName="name" placeholder="Kovács János" />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Email</mat-label>
-        <input matInput placeholder="email@example.com" />
+        <input
+          matInput
+          formControlName="email"
+          placeholder="email@example.com"
+        />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Jelszó</mat-label>
-        <input matInput type="password" />
+        <input matInput formControlName="password" type="password" />
+        <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
+          Jelszó megadása kötelező
+        </mat-error>
+        <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
+          A jelszónak legalább 6 karakter hosszúnak kell lennie
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Jelszó megerősítése</mat-label>
-        <input matInput type="password" />
+        <input matInput formControlName="passwordConfirm" type="password" />
+        <mat-error
+          *ngIf="registerForm.get('passwordConfirm')?.hasError('required')"
+        >
+          Jelszó megerősítése kötelező
+        </mat-error>
       </mat-form-field>
+
+      <mat-error
+        *ngIf="
+          registerForm.hasError('passwordMismatch') &&
+          !registerForm.get('passwordConfirm')?.hasError('required')
+        "
+      >
+        A jelszavak nem egyeznek
+      </mat-error>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+      </div>
+
+      <mat-card-actions>
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          [disabled]="registerForm.invalid || loading"
+        >
+          {{ loading ? "Feldolgozás..." : "Regisztráció" }}
+        </button>
+        <button type="button" mat-button routerLink="/login">
+          Bejelentkezés
+        </button>
+      </mat-card-actions>
     </form>
   </mat-card-content>
-  <mat-card-actions>
-    <button mat-raised-button color="primary">Regisztráció</button>
-    <button mat-button routerLink="/login">Bejelentkezés</button>
-  </mat-card-actions>
 </mat-card>

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -110,7 +110,7 @@ import { CommonModule } from '@angular/common';
     </mat-dialog-content>
   `,
 })
-export class JobDialogComponent {
+export class JobDialogComponent implements OnDestroy {
   form = new FormGroup({
     title: new FormControl('', Validators.required),
     company: new FormControl('', Validators.required),
@@ -127,6 +127,10 @@ export class JobDialogComponent {
     public dialogRef: MatDialogRef<JobDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Job
   ) {}
+
+  ngOnDestroy(): void {
+    // Lifecycle hook for cleanup if needed
+  }
 
   onSubmit() {
     if (this.form.valid) {

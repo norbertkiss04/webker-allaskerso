@@ -8,6 +8,7 @@
   <mat-form-field appearance="outline" class="search-bar">
     <mat-label>Keresés állások között</mat-label>
     <input
+      #searchInput
       matInput
       [(ngModel)]="searchTerm"
       placeholder="Pozíció vagy cég neve"

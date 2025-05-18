@@ -1,4 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnChanges,
+  AfterViewInit,
+  SimpleChanges,
+  Input,
+  ViewChild,
+  ElementRef,
+  OnDestroy,
+} from '@angular/core';
 import { TruncatePipe } from '../../shared/truncate.pipe';
 import { Job } from '../../shared/model';
 import { MatDialog } from '@angular/material/dialog';
@@ -7,6 +17,7 @@ import { ConfirmationDialogComponent } from '../shared/confirmation-dialog/confi
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
 import { BookmarkService } from '../bookmark.service';
+import { JobService } from './job.service';
 import {
   FormBuilder,
   FormGroup,
@@ -19,6 +30,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-jobs',
@@ -37,72 +49,124 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss',
 })
-export class JobsComponent {
+export class JobsComponent
+  implements OnInit, OnChanges, AfterViewInit, OnDestroy
+{
+  @Input() initialSearchTerm: string = '';
+  @ViewChild('searchInput') searchInputElement!: ElementRef;
+
+  lastSearchTime: Date | null = null;
+  jobsLoaded: boolean = false;
   searchTerm = '';
   showDetails: { [key: number]: boolean } = {};
   bookmarks: number[] = [];
+  jobs: Job[] = [];
+  private subscriptions: Subscription[] = [];
+  private bookmarkedJobs: { [key: number]: boolean } = {};
 
   constructor(
     public authService: AuthService,
     private bookmarkService: BookmarkService,
+    private jobService: JobService,
     private dialog: MatDialog
   ) {
-    const savedJobs = localStorage.getItem('jobs');
-    if (savedJobs) {
-      this.jobs = JSON.parse(savedJobs);
+    console.log('JobsComponent constructor called');
+  }
+
+  ngOnInit(): void {
+    console.log('JobsComponent initialized');
+    // Load jobs using the service
+    this.loadJobs();
+
+    // Apply initial search term if provided
+    if (this.initialSearchTerm) {
+      this.searchTerm = this.initialSearchTerm;
+      console.log(`Initial search term applied: ${this.initialSearchTerm}`);
+    }
+
+    // Load bookmark status for current user
+    this.loadBookmarkStatus();
+  }
+
+  private loadJobs(): void {
+    const subscription = this.jobService.getJobs().subscribe({
+      next: (jobs) => {
+        this.jobs = jobs;
+        this.jobsLoaded = true;
+        console.log(`Loaded ${this.jobs.length} jobs from service`);
+      },
+      error: (error) => {
+        console.error('Error loading jobs:', error);
+      },
+    });
+    this.subscriptions.push(subscription);
+  }
+
+  private loadBookmarkStatus(): void {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      const subscription = this.bookmarkService
+        .getBookmarks(user.id.toString())
+        .subscribe({
+          next: (bookmarkedJobs) => {
+            bookmarkedJobs.forEach((job) => {
+              this.bookmarkedJobs[job.id] = true;
+            });
+          },
+          error: (error) => {
+            console.error('Error loading bookmarks:', error);
+          },
+        });
+      this.subscriptions.push(subscription);
     }
   }
 
-  jobs: Job[] = [
-    {
-      id: 1,
-      title: 'Frontend Fejlesztő (Senior)',
-      company: 'Tech Corp International',
-      location: 'Budapest, Magyarország',
-      salary: 1200000,
-      description:
-        'Szenior Angular fejlesztői pozíció, amely Angular 15+, RxJS és NgRx állapotkezelés mély ismeretét követeli meg. Szükséges vállalati szintű alkalmazások fejlesztésének bizonyított tapasztalata.',
-      longDescription:
-        'Csatlakozz csapatunkhoz, ahol legújabb Angular alkalmazásokon dolgozhatsz. Együttműködés UX tervezőkkel és backend csapatokkal kiváló minőségű webalkalmazások létrehozásában.',
-      requirements: ['Angular', 'TypeScript', 'HTML/CSS'],
-      contactInfo: {
-        email: 'careers@techcorp.hu',
-        phone: '+36 123 4567',
-      },
-      createdDate: new Date(),
-    },
-    {
-      id: 2,
-      title: 'Backend Fejlesztő',
-      company: 'Code Masters',
-      location: 'Távoli',
-      salary: 900000,
-      description: 'Node.js backend fejlesztés',
-      longDescription:
-        'Skálázható mikroszolgáltatás architektúra fejlesztése Node.js és TypeScript használatával. Nagy forgalmú, elosztott rendszereken alapuló alkalmazások fejlesztése.',
-      requirements: ['Node.js', 'PostgreSQL', 'REST API'],
-      contactInfo: {
-        email: 'hr@codemasters.com',
-      },
-      createdDate: new Date(),
-    },
-    {
-      id: 3,
-      title: 'UX Designer',
-      company: 'Design Hub',
-      location: 'Szeged',
-      salary: 700000,
-      description: 'Felhasználói élmény tervezés',
-      longDescription:
-        'Intuitív felhasználói felületek tervezése és felhasználói kutatások végrehajtása. Szoros együttműködés termékcsapatokkal prototípusok készítéséhez és teszteléséhez.',
-      requirements: ['Figma', 'UI/UX', 'Prototípus készítés'],
-      contactInfo: {
-        email: 'design-jobs@designhub.hu',
-        phone: '+36 987 6543',
-      },
-      createdDate: new Date(),
-    },
-  ];
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('JobsComponent input properties changed', changes);
+
+    // React to changes in the initialSearchTerm input property
+    if (
+      changes['initialSearchTerm'] &&
+      !changes['initialSearchTerm'].firstChange
+    ) {
+      const currentValue = changes['initialSearchTerm'].currentValue;
+      const previousValue = changes['initialSearchTerm'].previousValue;
+
+      console.log(
+        `Search term changed from "${previousValue}" to "${currentValue}"`
+      );
+
+      // Update the search term and log the number of matching jobs
+      this.searchTerm = currentValue;
+      this.lastSearchTime = new Date();
+      console.log(
+        `Found ${
+          this.filteredJobs.length
+        } matching jobs at ${this.lastSearchTime.toLocaleTimeString()}`
+      );
+    }
+  }
+
+  ngAfterViewInit(): void {
+    console.log('JobsComponent view initialized');
+
+    // Focus on the search input if available
+    if (this.searchInputElement) {
+      // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+      setTimeout(() => {
+        this.searchInputElement.nativeElement.focus();
+        console.log('Search input focused');
+      }, 0);
+    }
+
+    // Log the rendered job cards
+    console.log(`Rendered ${this.filteredJobs.length} job cards in the view`);
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscriptions to prevent memory leaks
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
 
   get filteredJobs() {
     return this.jobs.filter(
@@ -120,15 +184,23 @@ export class JobsComponent {
   toggleBookmark(job: Job): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      this.bookmarkService.toggleBookmark(user.id.toString(), job);
+      const subscription = this.bookmarkService
+        .toggleBookmark(user.id.toString(), job)
+        .subscribe({
+          next: (updatedBookmarks) => {
+            // Update local bookmarked status
+            this.bookmarkedJobs[job.id] = !this.bookmarkedJobs[job.id];
+          },
+          error: (error) => {
+            console.error('Error toggling bookmark:', error);
+          },
+        });
+      this.subscriptions.push(subscription);
     }
   }
 
   isBookmarked(jobId: number): boolean {
-    const user = this.authService.getCurrentUser();
-    return user
-      ? this.bookmarkService.isBookmarked(user.id.toString(), jobId)
-      : false;
+    return this.bookmarkedJobs[jobId] || false;
   }
 
   deleteJob(jobId: number): void {
@@ -141,9 +213,29 @@ export class JobsComponent {
 
     confirmDialog.afterClosed().subscribe((result) => {
       if (result) {
-        this.jobs = this.jobs.filter((job) => job.id !== jobId);
-        localStorage.setItem('jobs', JSON.stringify(this.jobs));
-        this.bookmarkService.removeBookmarksForJob(jobId.toString());
+        // Delete job using service
+        const deleteSubscription = this.jobService.deleteJob(jobId).subscribe({
+          next: (success) => {
+            if (success) {
+              // Remove from local array
+              this.jobs = this.jobs.filter((job) => job.id !== jobId);
+
+              // Remove bookmarks for this job
+              const bookmarkSubscription = this.bookmarkService
+                .removeBookmarksForJob(jobId.toString())
+                .subscribe({
+                  error: (error) => {
+                    console.error('Error removing bookmarks:', error);
+                  },
+                });
+              this.subscriptions.push(bookmarkSubscription);
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting job:', error);
+          },
+        });
+        this.subscriptions.push(deleteSubscription);
       }
     });
   }
@@ -155,9 +247,17 @@ export class JobsComponent {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        result.id = Math.max(...this.jobs.map((j) => j.id)) + 1;
-        this.jobs.push(result);
-        localStorage.setItem('jobs', JSON.stringify(this.jobs));
+        // Create job using service
+        const subscription = this.jobService.createJob(result).subscribe({
+          next: (newJob) => {
+            // Add to local array
+            this.jobs.push(newJob);
+          },
+          error: (error) => {
+            console.error('Error creating job:', error);
+          },
+        });
+        this.subscriptions.push(subscription);
       }
     });
   }
