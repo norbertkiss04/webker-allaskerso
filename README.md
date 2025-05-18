@@ -4,4 +4,4 @@ admin:
 email: admin@example.com
 jelszo: admin@example.com
 
-Teszteleshez: npm install && ng serve
+lokalis teszteleshez: npm install, npm start
