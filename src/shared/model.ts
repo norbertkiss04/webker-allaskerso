@@ -1,5 +1,5 @@
 export interface Job {
-  id: number;
+  id: string;
   title: string;
   company: string;
   location: string;
@@ -15,16 +15,24 @@ export interface Job {
 }
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  password: string;
+  password?: string; // Optional for Firebase users
   admin: boolean;
 }
 
 export interface Bookmark {
-  id: number;
-  userId: number;
-  jobId: number;
+  id: string;
+  userId: string;
+  jobId: string;
   createdDate: Date;
+}
+
+// Firebase specific interfaces
+export interface FirebaseUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
 }

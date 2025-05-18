@@ -12,7 +12,7 @@
     <a mat-button routerLink="/jobs" routerLinkActive="active">Állások</a>
     <a
       mat-button
-      *ngIf="authService.getCurrentUser()"
+      *ngIf="authService.currentUser$ | async"
       routerLink="/bookmarks"
       routerLinkActive="active"
       >Könyvjelzők</a
@@ -23,7 +23,7 @@
     <a mat-button routerLink="/jobs" routerLinkActive="active">Állások</a>
     <a
       mat-button
-      *ngIf="authService.getCurrentUser()"
+      *ngIf="authService.currentUser$ | async"
       routerLink="/bookmarks"
       routerLinkActive="active"
       >Könyvjelzők</a
@@ -31,15 +31,21 @@
   </nav>
 
   <div class="auth-section">
-    <a mat-button *ngIf="!authService.getCurrentUser()" routerLink="/login">{{
-      "Bejelentkezés"
-    }}</a>
-    <a mat-button *ngIf="!authService.getCurrentUser()" routerLink="/register"
+    <a
+      mat-button
+      *ngIf="!(authService.currentUser$ | async)"
+      routerLink="/login"
+      >{{ "Bejelentkezés" }}</a
+    >
+    <a
+      mat-button
+      *ngIf="!(authService.currentUser$ | async)"
+      routerLink="/register"
       >Regisztráció</a
     >
     <button
       mat-raised-button
-      *ngIf="authService.getCurrentUser()"
+      *ngIf="authService.currentUser$ | async"
       color="accent"
       (click)="onLogout()"
     >

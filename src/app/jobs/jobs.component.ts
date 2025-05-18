@@ -15,7 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { JobDialogComponent } from './job-dialog/job-dialog.component';
 import { ConfirmationDialogComponent } from '../shared/confirmation-dialog/confirmation-dialog.component';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../auth/auth.service';
+import { FirebaseAuthService } from '../services/firebase-auth.service';
 import { BookmarkService } from '../bookmark.service';
 import { JobService } from './job.service';
 import {
@@ -58,14 +58,14 @@ export class JobsComponent
   lastSearchTime: Date | null = null;
   jobsLoaded: boolean = false;
   searchTerm = '';
-  showDetails: { [key: number]: boolean } = {};
-  bookmarks: number[] = [];
+  showDetails: { [key: string]: boolean } = {};
+  bookmarks: string[] = [];
   jobs: Job[] = [];
   private subscriptions: Subscription[] = [];
-  private bookmarkedJobs: { [key: number]: boolean } = {};
+  private bookmarkedJobs: { [key: string]: boolean } = {};
 
   constructor(
-    public authService: AuthService,
+    public authService: FirebaseAuthService,
     private bookmarkService: BookmarkService,
     private jobService: JobService,
     private dialog: MatDialog
@@ -106,7 +106,7 @@ export class JobsComponent
     const user = this.authService.getCurrentUser();
     if (user) {
       const subscription = this.bookmarkService
-        .getBookmarks(user.id.toString())
+        .getBookmarks(user.uid)
         .subscribe({
           next: (bookmarkedJobs) => {
             bookmarkedJobs.forEach((job) => {
@@ -177,7 +177,7 @@ export class JobsComponent
     );
   }
 
-  toggleDetails(jobId: number): void {
+  toggleDetails(jobId: string): void {
     this.showDetails[jobId] = !this.showDetails[jobId];
   }
 
@@ -185,7 +185,7 @@ export class JobsComponent
     const user = this.authService.getCurrentUser();
     if (user) {
       const subscription = this.bookmarkService
-        .toggleBookmark(user.id.toString(), job)
+        .toggleBookmark(user.uid, job)
         .subscribe({
           next: (updatedBookmarks) => {
             // Update local bookmarked status
@@ -199,11 +199,11 @@ export class JobsComponent
     }
   }
 
-  isBookmarked(jobId: number): boolean {
+  isBookmarked(jobId: string): boolean {
     return this.bookmarkedJobs[jobId] || false;
   }
 
-  deleteJob(jobId: number): void {
+  deleteJob(jobId: string): void {
     const confirmDialog = this.dialog.open(ConfirmationDialogComponent, {
       data: {
         title: 'Állás törlése',
@@ -222,7 +222,7 @@ export class JobsComponent
 
               // Remove bookmarks for this job
               const bookmarkSubscription = this.bookmarkService
-                .removeBookmarksForJob(jobId.toString())
+                .removeBookmarksForJob(jobId)
                 .subscribe({
                   error: (error) => {
                     console.error('Error removing bookmarks:', error);

@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { FirebaseAuthService } from '../../services/firebase-auth.service';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import {
@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -24,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatProgressSpinnerModule,
     RouterModule,
   ],
   templateUrl: './login.component.html',
@@ -33,17 +35,22 @@ export class LoginComponent implements OnDestroy {
   loginForm: FormGroup;
   errorMessage: string | null = null;
   loading: boolean = false;
+  returnUrl: string = '/jobs';
   private subscriptions: Subscription[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
+    private authService: FirebaseAuthService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
+
+    // Get return URL from route parameters or default to '/jobs'
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/jobs';
   }
 
   ngOnDestroy(): void {
@@ -58,23 +65,29 @@ export class LoginComponent implements OnDestroy {
       this.loading = true;
       const { email, password } = this.loginForm.value;
 
-      // Use the Observable-based login method
+      // Use the Firebase authentication service
       const subscription = this.authService.login(email, password).subscribe({
         next: (user) => {
           console.log('Auth service response:', user);
           this.loading = false;
-
-          if (user) {
-            this.router.navigate(['/jobs']);
-          } else {
-            this.errorMessage =
-              'Invalid credentials - please check your email and password';
-          }
+          this.router.navigateByUrl(this.returnUrl);
         },
         error: (error) => {
           console.error('Login error:', error);
           this.loading = false;
-          this.errorMessage = 'Login failed - please try again later';
+
+          // Provide more specific error messages based on Firebase error codes
+          if (
+            error.code === 'auth/user-not-found' ||
+            error.code === 'auth/wrong-password'
+          ) {
+            this.errorMessage = 'Invalid email or password';
+          } else if (error.code === 'auth/too-many-requests') {
+            this.errorMessage =
+              'Too many failed login attempts. Please try again later.';
+          } else {
+            this.errorMessage = 'Login failed - please try again later';
+          }
         },
       });
 

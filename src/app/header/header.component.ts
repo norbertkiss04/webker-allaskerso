@@ -4,7 +4,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../auth/auth.service';
+import { FirebaseAuthService } from '../services/firebase-auth.service';
 
 @Component({
   selector: 'app-header',
@@ -22,13 +22,13 @@ import { AuthService } from '../auth/auth.service';
 export class HeaderComponent {
   isMenuOpen = false;
 
-  constructor(public authService: AuthService) {}
+  constructor(public authService: FirebaseAuthService) {}
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
   onLogout(): void {
-    this.authService.logout();
+    this.authService.logout().subscribe();
   }
 }

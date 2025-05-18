@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { BookmarkService } from '../bookmark.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { AuthService } from '../auth/auth.service';
+import { FirebaseAuthService } from '../services/firebase-auth.service';
 import { Job } from '../../shared/model';
 import { Subscription, interval, switchMap } from 'rxjs';
 
@@ -21,7 +21,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   constructor(
     private bookmarkService: BookmarkService,
-    private authService: AuthService
+    private authService: FirebaseAuthService
   ) {}
 
   ngOnInit(): void {
@@ -33,9 +33,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
     const user = this.authService.getCurrentUser();
     if (user) {
       const refreshSubscription = interval(30000)
-        .pipe(
-          switchMap(() => this.bookmarkService.getBookmarks(user.id.toString()))
-        )
+        .pipe(switchMap(() => this.bookmarkService.getBookmarks(user.uid)))
         .subscribe({
           next: (bookmarks) => {
             this.bookmarks = bookmarks;
@@ -63,7 +61,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
     const user = this.authService.getCurrentUser();
     if (user) {
       const subscription = this.bookmarkService
-        .getBookmarks(user.id.toString())
+        .getBookmarks(user.uid)
         .subscribe({
           next: (bookmarks) => {
             this.bookmarks = bookmarks;

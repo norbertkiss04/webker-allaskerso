@@ -1,65 +1,114 @@
-# Álláskereső portál
+# Job Portal Application with Firebase
 
-Email:Jelszó
+This Angular application is configured to use Firebase for authentication, database, and hosting.
 
-admin@admin.com:admin
+## Implementation Order
 
-user@test.com:test123
+The implementation follows this order:
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
+1. **Firebase Project Setup and Configuration**
+2. **Firebase Authentication**
+3. **Route Protection with AuthGuard**
+4. **Firebase Firestore Database**
 
-## Development server
+## Firebase Setup
 
-To start a local development server, run:
+### Prerequisites
 
-```bash
-ng serve
+- Node.js and npm installed
+- Angular CLI installed (`npm install -g @angular/cli`)
+- Firebase CLI installed (`npm install -g firebase-tools`)
+
+### Step 1: Firebase Project Setup
+
+1. **Login to Firebase CLI**:
+
+   ```bash
+   firebase login
+   ```
+
+2. **Build the application**:
+
+   ```bash
+   ng build
+   ```
+
+3. **Deploy to Firebase**:
+   ```bash
+   firebase deploy
+   ```
+
+This will deploy both the hosting and Firestore rules.
+
+## Firebase Authentication
+
+The application uses Firebase Authentication for user management. Key features:
+
+- Email/password authentication
+- Protected routes with AuthGuard
+- User profile management
+
+### Authentication Flow
+
+1. Users register with email/password
+2. Login with credentials
+3. AuthGuard protects routes that require authentication
+
+## Route Protection with AuthGuard
+
+Routes are protected using Angular route guards:
+
+- `AuthGuard`: Ensures users are authenticated
+- `AdminGuard`: Ensures users have admin privileges
+
+To add protection to a route, update the route configuration in `app.routes.ts`:
+
+```typescript
+{
+  path: 'protected-route',
+  component: ProtectedComponent,
+  canActivate: [AuthGuard]
+}
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Firebase Firestore Database
 
-## Code scaffolding
+The application uses Firestore for data storage:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Jobs collection: Stores job listings
+- Bookmarks collection: Stores user bookmarks
+- Users collection: Stores additional user data
 
-```bash
-ng generate component component-name
-```
+### Database Security Rules
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Firestore security rules are configured in `firestore.rules`:
 
-```bash
-ng generate --help
-```
+- Public read access for jobs
+- Protected write access for jobs (admin only)
+- User-specific access for bookmarks
 
-## Building
+## Development Workflow
 
-To build the project run:
+1. **Run locally**:
 
-```bash
-ng build
-```
+   ```bash
+   ng serve
+   ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+2. **Test with Firebase emulators**:
 
-## Running unit tests
+   ```bash
+   firebase emulators:start
+   ```
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+3. **Deploy changes**:
+   ```bash
+   ng build
+   firebase deploy
+   ```
 
 ## Additional Resources
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- [Angular Documentation](https://angular.io/docs)
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [AngularFire Documentation](https://github.com/angular/angularfire)

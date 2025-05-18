@@ -136,7 +136,7 @@ export class JobDialogComponent implements OnDestroy {
     if (this.form.valid) {
       const formValue = this.form.value;
       const job: Job = {
-        id: 0, // Temporary ID for frontend
+        id: '0', // Temporary ID for frontend
         title: formValue.title!,
         company: formValue.company!,
         location: formValue.location!,

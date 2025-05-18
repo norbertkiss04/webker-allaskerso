@@ -13,7 +13,7 @@ export class JobService {
     if (!localStorage.getItem(this.STORAGE_KEY)) {
       const defaultJobs: Job[] = [
         {
-          id: 1,
+          id: '1',
           title: 'Frontend Fejlesztő (Senior)',
           company: 'Tech Corp International',
           location: 'Budapest, Magyarország',
@@ -30,7 +30,7 @@ export class JobService {
           createdDate: new Date(),
         },
         {
-          id: 2,
+          id: '2',
           title: 'Backend Fejlesztő',
           company: 'Code Masters',
           location: 'Távoli',
@@ -45,7 +45,7 @@ export class JobService {
           createdDate: new Date(),
         },
         {
-          id: 3,
+          id: '3',
           title: 'UX Designer',
           company: 'Design Hub',
           location: 'Szeged',
@@ -69,9 +69,12 @@ export class JobService {
   createJob(job: Omit<Job, 'id'>): Observable<Job> {
     try {
       const jobs = this.getJobsFromStorage();
-      const newId =
-        jobs.length > 0 ? Math.max(...jobs.map((j) => j.id)) + 1 : 1;
-      const newJob: Job = { ...job, id: newId };
+      // Generate a string ID
+      const nextNumericId =
+        jobs.length > 0
+          ? Math.max(...jobs.map((j) => parseInt(j.id, 10))) + 1
+          : 1;
+      const newJob: Job = { ...job, id: nextNumericId.toString() };
 
       jobs.push(newJob);
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(jobs));
@@ -93,7 +96,7 @@ export class JobService {
   }
 
   // READ (single)
-  getJobById(id: number): Observable<Job | undefined> {
+  getJobById(id: string): Observable<Job | undefined> {
     try {
       const jobs = this.getJobsFromStorage();
       const job = jobs.find((j) => j.id === id);
@@ -125,7 +128,7 @@ export class JobService {
   }
 
   // DELETE
-  deleteJob(id: number): Observable<boolean> {
+  deleteJob(id: string): Observable<boolean> {
     try {
       const jobs = this.getJobsFromStorage();
       const filteredJobs = jobs.filter((j) => j.id !== id);

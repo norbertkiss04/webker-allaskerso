@@ -24,7 +24,7 @@ export class AuthService {
     const adminExists = users.some((u) => u.email === 'admin@admin.com');
     if (!adminExists) {
       const adminUser: User = {
-        id: 1,
+        id: '1',
         name: 'Admin',
         email: 'admin@admin.com',
         password: 'admin',
@@ -37,7 +37,7 @@ export class AuthService {
     const testUserExists = users.some((u) => u.email === 'user@test.com');
     if (!testUserExists) {
       const testUser: User = {
-        id: 2,
+        id: '2',
         name: 'Test User',
         email: 'user@test.com',
         password: 'test123',
@@ -136,7 +136,9 @@ export class AuthService {
     localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
   }
 
-  private generateId(users: User[]): number {
-    return users.length > 0 ? Math.max(...users.map((u) => u.id)) + 1 : 1;
+  private generateId(users: User[]): string {
+    return users.length > 0
+      ? Math.max(...users.map((u) => parseInt(u.id, 10))) + 1 + ''
+      : '1';
   }
 }

@@ -26,9 +26,7 @@ export class BookmarkService {
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith('bookmarks_')) {
           const bookmarks = JSON.parse(localStorage.getItem(key) || '[]');
-          const filtered = bookmarks.filter(
-            (job: Job) => job.id !== Number(jobId)
-          );
+          const filtered = bookmarks.filter((job: Job) => job.id !== jobId);
           localStorage.setItem(key, JSON.stringify(filtered));
         }
       });
@@ -59,7 +57,7 @@ export class BookmarkService {
   }
 
   // READ - Check if a job is bookmarked
-  isBookmarked(userId: string, jobId: number): Observable<boolean> {
+  isBookmarked(userId: string, jobId: string): Observable<boolean> {
     try {
       const bookmarksData = localStorage.getItem(this.storageKey(userId));
       const bookmarks = bookmarksData ? JSON.parse(bookmarksData) : [];
