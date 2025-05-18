@@ -64,9 +64,7 @@ export class BookmarkService {
       const isBookmarked = bookmarks.some((b: Job) => b.id === jobId);
       return of(isBookmarked);
     } catch (error) {
-      return throwError(
-        () => new Error('Failed to check if job is bookmarked')
-      );
+      return throwError(() => new Error('Failed to check if job is bookmarked'));
     }
   }
 }

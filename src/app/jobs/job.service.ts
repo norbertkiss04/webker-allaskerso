@@ -9,7 +9,6 @@ export class JobService {
   private readonly STORAGE_KEY = 'jobs';
 
   constructor() {
-    // Initialize with default jobs if none exist
     if (!localStorage.getItem(this.STORAGE_KEY)) {
       const defaultJobs: Job[] = [
         {
@@ -65,15 +64,11 @@ export class JobService {
     }
   }
 
-  // CREATE
   createJob(job: Omit<Job, 'id'>): Observable<Job> {
     try {
       const jobs = this.getJobsFromStorage();
-      // Generate a string ID
       const nextNumericId =
-        jobs.length > 0
-          ? Math.max(...jobs.map((j) => parseInt(j.id, 10))) + 1
-          : 1;
+        jobs.length > 0 ? Math.max(...jobs.map((j) => parseInt(j.id, 10))) + 1 : 1;
       const newJob: Job = { ...job, id: nextNumericId.toString() };
 
       jobs.push(newJob);
@@ -85,7 +80,6 @@ export class JobService {
     }
   }
 
-  // READ (all)
   getJobs(): Observable<Job[]> {
     try {
       const jobs = this.getJobsFromStorage();
@@ -95,7 +89,6 @@ export class JobService {
     }
   }
 
-  // READ (single)
   getJobById(id: string): Observable<Job | undefined> {
     try {
       const jobs = this.getJobsFromStorage();
@@ -113,9 +106,7 @@ export class JobService {
       const index = jobs.findIndex((j) => j.id === updatedJob.id);
 
       if (index === -1) {
-        return throwError(
-          () => new Error(`Job with id ${updatedJob.id} not found`)
-        );
+        return throwError(() => new Error(`Job with id ${updatedJob.id} not found`));
       }
 
       jobs[index] = updatedJob;

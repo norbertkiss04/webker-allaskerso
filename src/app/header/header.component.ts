@@ -9,13 +9,7 @@ import { FirebaseAuthService } from '../services/firebase-auth.service';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    RouterModule,
-  ],
+  imports: [CommonModule, MatToolbarModule, MatButtonModule, MatIconModule, RouterModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })

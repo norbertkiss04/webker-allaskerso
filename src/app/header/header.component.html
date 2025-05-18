@@ -1,10 +1,5 @@
 <mat-toolbar color="primary">
-  <button
-    mat-icon-button
-    aria-label="Menu"
-    class="mobile-menu"
-    (click)="toggleMenu()"
-  >
+  <button mat-icon-button aria-label="Menu" class="mobile-menu" (click)="toggleMenu()">
     <mat-icon>menu</mat-icon>
   </button>
 
@@ -31,16 +26,10 @@
   </nav>
 
   <div class="auth-section">
-    <a
-      mat-button
-      *ngIf="!(authService.currentUser$ | async)"
-      routerLink="/login"
-      >{{ "Bejelentkezés" }}</a
-    >
-    <a
-      mat-button
-      *ngIf="!(authService.currentUser$ | async)"
-      routerLink="/register"
+    <a mat-button *ngIf="!(authService.currentUser$ | async)" routerLink="/login">{{
+      'Bejelentkezés'
+    }}</a>
+    <a mat-button *ngIf="!(authService.currentUser$ | async)" routerLink="/register"
       >Regisztráció</a
     >
     <button

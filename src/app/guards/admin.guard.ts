@@ -15,28 +15,22 @@ import { FirebaseAuthService } from '../services/firebase-auth.service';
 export class AdminGuard implements CanActivate {
   constructor(
     private authService: FirebaseAuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ):
-    | Observable<boolean | UrlTree>
-    | Promise<boolean | UrlTree>
-    | boolean
-    | UrlTree {
+    state: RouterStateSnapshot,
+  ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.authService.isAdmin().pipe(
       take(1),
       map((isAdmin) => {
         if (isAdmin) {
-          // User is an admin, allow access
           return true;
         } else {
-          // User is not an admin, redirect to jobs page
           return this.router.createUrlTree(['/jobs']);
         }
-      })
+      }),
     );
   }
 }

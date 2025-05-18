@@ -1,4 +1,4 @@
-@use "@angular/material" as mat;
+@use '@angular/material' as mat;
 
 $primary-color: #3f51b5;
 $chip-bg: #f8c2c2;
@@ -8,7 +8,7 @@ $card-hover: rgba(0, 0, 0, 0.04);
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .search-bar {
@@ -80,7 +80,9 @@ $card-hover: rgba(0, 0, 0, 0.04);
 .job-card {
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-4px);
@@ -151,7 +153,9 @@ $card-hover: rgba(0, 0, 0, 0.04);
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     background-color: #f0f0f0;

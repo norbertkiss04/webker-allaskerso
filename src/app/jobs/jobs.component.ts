@@ -18,19 +18,13 @@ import { CommonModule } from '@angular/common';
 import { FirebaseAuthService } from '../services/firebase-auth.service';
 import { BookmarkService } from '../bookmark.service';
 import { JobService } from './job.service';
-import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-jobs',
@@ -49,9 +43,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss',
 })
-export class JobsComponent
-  implements OnInit, OnChanges, AfterViewInit, OnDestroy
-{
+export class JobsComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() initialSearchTerm: string = '';
   @ViewChild('searchInput') searchInputElement!: ElementRef;
 
@@ -61,6 +53,7 @@ export class JobsComponent
   showDetails: { [key: string]: boolean } = {};
   bookmarks: string[] = [];
   jobs: Job[] = [];
+  isAdmin$: Observable<boolean>;
   private subscriptions: Subscription[] = [];
   private bookmarkedJobs: { [key: string]: boolean } = {};
 
@@ -68,23 +61,21 @@ export class JobsComponent
     public authService: FirebaseAuthService,
     private bookmarkService: BookmarkService,
     private jobService: JobService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
   ) {
     console.log('JobsComponent constructor called');
+    this.isAdmin$ = this.authService.isAdmin();
   }
 
   ngOnInit(): void {
     console.log('JobsComponent initialized');
-    // Load jobs using the service
     this.loadJobs();
 
-    // Apply initial search term if provided
     if (this.initialSearchTerm) {
       this.searchTerm = this.initialSearchTerm;
       console.log(`Initial search term applied: ${this.initialSearchTerm}`);
     }
 
-    // Load bookmark status for current user
     this.loadBookmarkStatus();
   }
 
@@ -105,18 +96,16 @@ export class JobsComponent
   private loadBookmarkStatus(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      const subscription = this.bookmarkService
-        .getBookmarks(user.uid)
-        .subscribe({
-          next: (bookmarkedJobs) => {
-            bookmarkedJobs.forEach((job) => {
-              this.bookmarkedJobs[job.id] = true;
-            });
-          },
-          error: (error) => {
-            console.error('Error loading bookmarks:', error);
-          },
-        });
+      const subscription = this.bookmarkService.getBookmarks(user.uid).subscribe({
+        next: (bookmarkedJobs) => {
+          bookmarkedJobs.forEach((job) => {
+            this.bookmarkedJobs[job.id] = true;
+          });
+        },
+        error: (error) => {
+          console.error('Error loading bookmarks:', error);
+        },
+      });
       this.subscriptions.push(subscription);
     }
   }
@@ -124,47 +113,35 @@ export class JobsComponent
   ngOnChanges(changes: SimpleChanges): void {
     console.log('JobsComponent input properties changed', changes);
 
-    // React to changes in the initialSearchTerm input property
-    if (
-      changes['initialSearchTerm'] &&
-      !changes['initialSearchTerm'].firstChange
-    ) {
+    if (changes['initialSearchTerm'] && !changes['initialSearchTerm'].firstChange) {
       const currentValue = changes['initialSearchTerm'].currentValue;
       const previousValue = changes['initialSearchTerm'].previousValue;
 
-      console.log(
-        `Search term changed from "${previousValue}" to "${currentValue}"`
-      );
+      console.log(`Search term changed from "${previousValue}" to "${currentValue}"`);
 
-      // Update the search term and log the number of matching jobs
       this.searchTerm = currentValue;
       this.lastSearchTime = new Date();
       console.log(
         `Found ${
           this.filteredJobs.length
-        } matching jobs at ${this.lastSearchTime.toLocaleTimeString()}`
+        } matching jobs at ${this.lastSearchTime.toLocaleTimeString()}`,
       );
     }
   }
 
   ngAfterViewInit(): void {
     console.log('JobsComponent view initialized');
-
-    // Focus on the search input if available
     if (this.searchInputElement) {
-      // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
       setTimeout(() => {
         this.searchInputElement.nativeElement.focus();
         console.log('Search input focused');
       }, 0);
     }
 
-    // Log the rendered job cards
     console.log(`Rendered ${this.filteredJobs.length} job cards in the view`);
   }
 
   ngOnDestroy(): void {
-    // Clean up subscriptions to prevent memory leaks
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
@@ -173,7 +150,7 @@ export class JobsComponent
       (job) =>
         job.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         job.company.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        job.location.toLowerCase().includes(this.searchTerm.toLowerCase())
+        job.location.toLowerCase().includes(this.searchTerm.toLowerCase()),
     );
   }
 
@@ -184,17 +161,14 @@ export class JobsComponent
   toggleBookmark(job: Job): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      const subscription = this.bookmarkService
-        .toggleBookmark(user.uid, job)
-        .subscribe({
-          next: (updatedBookmarks) => {
-            // Update local bookmarked status
-            this.bookmarkedJobs[job.id] = !this.bookmarkedJobs[job.id];
-          },
-          error: (error) => {
-            console.error('Error toggling bookmark:', error);
-          },
-        });
+      const subscription = this.bookmarkService.toggleBookmark(user.uid, job).subscribe({
+        next: (updatedBookmarks) => {
+          this.bookmarkedJobs[job.id] = !this.bookmarkedJobs[job.id];
+        },
+        error: (error) => {
+          console.error('Error toggling bookmark:', error);
+        },
+      });
       this.subscriptions.push(subscription);
     }
   }
@@ -213,14 +187,11 @@ export class JobsComponent
 
     confirmDialog.afterClosed().subscribe((result) => {
       if (result) {
-        // Delete job using service
         const deleteSubscription = this.jobService.deleteJob(jobId).subscribe({
           next: (success) => {
             if (success) {
-              // Remove from local array
               this.jobs = this.jobs.filter((job) => job.id !== jobId);
 
-              // Remove bookmarks for this job
               const bookmarkSubscription = this.bookmarkService
                 .removeBookmarksForJob(jobId)
                 .subscribe({
@@ -247,10 +218,8 @@ export class JobsComponent
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        // Create job using service
         const subscription = this.jobService.createJob(result).subscribe({
           next: (newJob) => {
-            // Add to local array
             this.jobs.push(newJob);
           },
           error: (error) => {

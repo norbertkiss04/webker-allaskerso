@@ -18,9 +18,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterModule } from '@angular/router';
 import { FirebaseAuthService } from '../../services/firebase-auth.service';
 
-// Custom validator to check if passwords match
 export const passwordMatchValidator: ValidatorFn = (
-  control: AbstractControl
+  control: AbstractControl,
 ): ValidationErrors | null => {
   const password = control.get('password');
   const confirmPassword = control.get('passwordConfirm');
@@ -56,7 +55,7 @@ export class RegisterComponent implements OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: FirebaseAuthService,
-    private router: Router
+    private router: Router,
   ) {
     this.registerForm = this.fb.group(
       {
@@ -65,12 +64,11 @@ export class RegisterComponent implements OnDestroy {
         password: ['', [Validators.required, Validators.minLength(6)]],
         passwordConfirm: ['', Validators.required],
       },
-      { validators: passwordMatchValidator }
+      { validators: passwordMatchValidator },
     );
   }
 
   ngOnDestroy(): void {
-    // Clean up subscriptions to prevent memory leaks
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
@@ -82,39 +80,33 @@ export class RegisterComponent implements OnDestroy {
 
       const { email, password, name } = this.registerForm.value;
 
-      const subscription = this.authService
-        .register(email, password, name)
-        .subscribe({
-          next: (user) => {
-            this.successMessage = 'Registration successful! Redirecting...';
-            this.loading = false;
+      const subscription = this.authService.register(email, password, name).subscribe({
+        next: (user) => {
+          this.successMessage = 'Registration successful! Redirecting...';
+          this.loading = false;
 
-            setTimeout(() => {
-              this.router.navigate(['/login']);
-            }, 1500);
-          },
-          error: (error) => {
-            this.loading = false;
-            console.error('Registration error:', error);
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 1500);
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Registration error:', error);
 
-            // Handle Firebase specific error codes
-            if (error.code === 'auth/email-already-in-use') {
-              this.errorMessage =
-                'This email is already registered. Please use a different email.';
-            } else if (error.code === 'auth/weak-password') {
-              this.errorMessage =
-                'Password is too weak. Please use a stronger password.';
-            } else {
-              this.errorMessage = 'Registration failed. Please try again.';
-            }
-          },
-        });
+          if (error.code === 'auth/email-already-in-use') {
+            this.errorMessage = 'This email is already registered. Please use a different email.';
+          } else if (error.code === 'auth/weak-password') {
+            this.errorMessage = 'Password is too weak. Please use a stronger password.';
+          } else {
+            this.errorMessage = 'Registration failed. Please try again.';
+          }
+        },
+      });
 
       this.subscriptions.push(subscription);
     }
   }
 
-  // Helper method to check if passwords match
   passwordsMatch(): boolean {
     const password = this.registerForm.get('password')?.value;
     const confirmPassword = this.registerForm.get('passwordConfirm')?.value;

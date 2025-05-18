@@ -21,15 +21,12 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   constructor(
     private bookmarkService: BookmarkService,
-    private authService: FirebaseAuthService
+    private authService: FirebaseAuthService,
   ) {}
 
   ngOnInit(): void {
     console.log('BookmarksComponent initialized');
     this.loadBookmarks();
-
-    // Set up a periodic refresh of bookmarks every 30 seconds
-    // This is useful to keep the bookmarks in sync with any changes made in other components
     const user = this.authService.getCurrentUser();
     if (user) {
       const refreshSubscription = interval(30000)
@@ -38,9 +35,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
           next: (bookmarks) => {
             this.bookmarks = bookmarks;
             this.lastRefreshTime = new Date();
-            console.log(
-              `Bookmarks refreshed at ${this.lastRefreshTime.toLocaleTimeString()}`
-            );
+            console.log(`Bookmarks refreshed at ${this.lastRefreshTime.toLocaleTimeString()}`);
           },
           error: (error) => {
             console.error('Error refreshing bookmarks:', error);
@@ -52,7 +47,6 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     console.log('BookmarksComponent destroyed');
-    // Clean up all subscriptions when the component is destroyed to prevent memory leaks
     this.subscriptions.forEach((sub) => sub.unsubscribe());
     console.log('All subscriptions unsubscribed');
   }
@@ -60,17 +54,15 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   private loadBookmarks(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      const subscription = this.bookmarkService
-        .getBookmarks(user.uid)
-        .subscribe({
-          next: (bookmarks) => {
-            this.bookmarks = bookmarks;
-            console.log(`Loaded ${bookmarks.length} bookmarks`);
-          },
-          error: (error) => {
-            console.error('Error loading bookmarks:', error);
-          },
-        });
+      const subscription = this.bookmarkService.getBookmarks(user.uid).subscribe({
+        next: (bookmarks) => {
+          this.bookmarks = bookmarks;
+          console.log(`Loaded ${bookmarks.length} bookmarks`);
+        },
+        error: (error) => {
+          console.error('Error loading bookmarks:', error);
+        },
+      });
       this.subscriptions.push(subscription);
     }
   }

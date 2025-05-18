@@ -14,14 +14,10 @@ import { CommonModule } from '@angular/common';
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button mat-dialog-close>Mégse</button>
-      <button mat-raised-button color="warn" [mat-dialog-close]="true">
-        Törlés
-      </button>
+      <button mat-raised-button color="warn" [mat-dialog-close]="true">Törlés</button>
     </mat-dialog-actions>
   `,
 })
 export class ConfirmationDialogComponent {
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { title: string; message: string }
-  ) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { title: string; message: string }) {}
 }

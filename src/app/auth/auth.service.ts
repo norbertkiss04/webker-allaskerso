@@ -81,17 +81,12 @@ export class AuthService {
   // READ - Login a user
   login(email: string, password: string): Observable<User | null> {
     try {
-      const user = this.getUsersSync().find(
-        (u) => u.email === email && u.password === password
-      );
+      const user = this.getUsersSync().find((u) => u.email === email && u.password === password);
 
       this.currentUser = user || null;
 
       if (this.currentUser) {
-        localStorage.setItem(
-          this.CURRENT_USER_KEY,
-          JSON.stringify(this.currentUser)
-        );
+        localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(this.currentUser));
       }
 
       return of(this.currentUser);
@@ -119,7 +114,7 @@ export class AuthService {
         tap(() => {
           // Redirect to root and force refresh
           window.location.href = '/';
-        })
+        }),
       );
     } catch (error) {
       return throwError(() => new Error('Failed to logout'));
@@ -137,8 +132,6 @@ export class AuthService {
   }
 
   private generateId(users: User[]): string {
-    return users.length > 0
-      ? Math.max(...users.map((u) => parseInt(u.id, 10))) + 1 + ''
-      : '1';
+    return users.length > 0 ? Math.max(...users.map((u) => parseInt(u.id, 10))) + 1 + '' : '1';
   }
 }

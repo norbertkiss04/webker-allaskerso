@@ -68,11 +68,7 @@ import { CommonModule } from '@angular/common';
 
         <mat-form-field appearance="outline">
           <mat-label>Részletes leírás</mat-label>
-          <textarea
-            matInput
-            formControlName="longDescription"
-            required
-          ></textarea>
+          <textarea matInput formControlName="longDescription" required></textarea>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
@@ -82,12 +78,7 @@ import { CommonModule } from '@angular/common';
 
         <mat-form-field appearance="outline">
           <mat-label>Kapcsolattartó email</mat-label>
-          <input
-            matInput
-            type="email"
-            formControlName="contactEmail"
-            required
-          />
+          <input matInput type="email" formControlName="contactEmail" required />
         </mat-form-field>
 
         <mat-form-field appearance="outline">
@@ -97,12 +88,7 @@ import { CommonModule } from '@angular/common';
 
         <mat-dialog-actions align="end">
           <button mat-button mat-dialog-close>Mégse</button>
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            [disabled]="!form.valid"
-          >
+          <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
             Mentés
           </button>
         </mat-dialog-actions>
@@ -125,22 +111,20 @@ export class JobDialogComponent implements OnDestroy {
 
   constructor(
     public dialogRef: MatDialogRef<JobDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Job
+    @Inject(MAT_DIALOG_DATA) public data: Job,
   ) {}
 
-  ngOnDestroy(): void {
-    // Lifecycle hook for cleanup if needed
-  }
+  ngOnDestroy(): void {}
 
   onSubmit() {
     if (this.form.valid) {
       const formValue = this.form.value;
       const job: Job = {
-        id: '0', // Temporary ID for frontend
+        id: '0',
         title: formValue.title!,
         company: formValue.company!,
         location: formValue.location!,
-        salary: +formValue.salary!, // Ensure numeric conversion
+        salary: +formValue.salary!,
         description: formValue.description!,
         longDescription: formValue.longDescription!,
         requirements: formValue.requirements!.split(',').map((s) => s.trim()),

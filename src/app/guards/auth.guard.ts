@@ -15,30 +15,24 @@ import { FirebaseAuthService } from '../services/firebase-auth.service';
 export class AuthGuard implements CanActivate {
   constructor(
     private authService: FirebaseAuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ):
-    | Observable<boolean | UrlTree>
-    | Promise<boolean | UrlTree>
-    | boolean
-    | UrlTree {
+    state: RouterStateSnapshot,
+  ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.authService.isLoggedIn().pipe(
       take(1),
       map((isLoggedIn) => {
         if (isLoggedIn) {
-          // User is logged in, allow access
           return true;
         } else {
-          // User is not logged in, redirect to login page
           return this.router.createUrlTree(['/login'], {
             queryParams: { returnUrl: state.url },
           });
         }
-      })
+      }),
     );
   }
 }

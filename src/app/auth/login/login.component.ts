@@ -3,12 +3,7 @@ import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { FirebaseAuthService } from '../../services/firebase-auth.service';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -42,19 +37,17 @@ export class LoginComponent implements OnDestroy {
     private fb: FormBuilder,
     private authService: FirebaseAuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
 
-    // Get return URL from route parameters or default to '/jobs'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/jobs';
   }
 
   ngOnDestroy(): void {
-    // Clean up subscriptions to prevent memory leaks
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
@@ -65,7 +58,6 @@ export class LoginComponent implements OnDestroy {
       this.loading = true;
       const { email, password } = this.loginForm.value;
 
-      // Use the Firebase authentication service
       const subscription = this.authService.login(email, password).subscribe({
         next: (user) => {
           console.log('Auth service response:', user);
@@ -75,16 +67,10 @@ export class LoginComponent implements OnDestroy {
         error: (error) => {
           console.error('Login error:', error);
           this.loading = false;
-
-          // Provide more specific error messages based on Firebase error codes
-          if (
-            error.code === 'auth/user-not-found' ||
-            error.code === 'auth/wrong-password'
-          ) {
+          if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
             this.errorMessage = 'Invalid email or password';
           } else if (error.code === 'auth/too-many-requests') {
-            this.errorMessage =
-              'Too many failed login attempts. Please try again later.';
+            this.errorMessage = 'Too many failed login attempts. Please try again later.';
           } else {
             this.errorMessage = 'Login failed - please try again later';
           }
