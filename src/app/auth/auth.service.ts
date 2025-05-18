@@ -20,7 +20,6 @@ export class AuthService {
   private initializeAdmin(): void {
     const users = this.getUsersSync();
 
-    // Ensure admin exists
     const adminExists = users.some((u) => u.email === 'admin@admin.com');
     if (!adminExists) {
       const adminUser: User = {
@@ -32,8 +31,6 @@ export class AuthService {
       };
       users.push(adminUser);
     }
-
-    // Add test user if missing
     const testUserExists = users.some((u) => u.email === 'user@test.com');
     if (!testUserExists) {
       const testUser: User = {
@@ -49,7 +46,6 @@ export class AuthService {
     this.saveUsersSync(users);
   }
 
-  // READ - Get all users
   getUsers(): Observable<User[]> {
     try {
       const users = this.getUsersSync();
@@ -59,12 +55,10 @@ export class AuthService {
     }
   }
 
-  // CREATE - Register a new user
   register(user: Omit<User, 'id'>): Observable<User> {
     try {
       const users = this.getUsersSync();
 
-      // Check if email already exists
       const emailExists = users.some((u) => u.email === user.email);
       if (emailExists) {
         return throwError(() => new Error('Email already registered'));
@@ -78,7 +72,6 @@ export class AuthService {
     }
   }
 
-  // READ - Login a user
   login(email: string, password: string): Observable<User | null> {
     try {
       const user = this.getUsersSync().find((u) => u.email === email && u.password === password);
@@ -94,25 +87,20 @@ export class AuthService {
       return throwError(() => new Error('Failed to login'));
     }
   }
-
-  // READ - Get current user (synchronous for convenience)
   getCurrentUser(): User | null {
     return this.currentUser;
   }
 
-  // READ - Check if current user is admin (synchronous for convenience)
   isAdmin(): boolean {
     return this.currentUser?.admin || false;
   }
 
-  // DELETE - Logout current user
   logout(): Observable<boolean> {
     try {
       this.currentUser = null;
       localStorage.removeItem(this.CURRENT_USER_KEY);
       return of(true).pipe(
         tap(() => {
-          // Redirect to root and force refresh
           window.location.href = '/';
         }),
       );
@@ -121,7 +109,6 @@ export class AuthService {
     }
   }
 
-  // Helper methods (synchronous for internal use)
   private getUsersSync(): User[] {
     const data = localStorage.getItem(this.USERS_KEY);
     return data ? JSON.parse(data) : [];
